@@ -1,8 +1,9 @@
 import {NextParsedUrlQuery} from "next/dist/server/request-meta";
 import {GetStaticPropsContext} from "next";
-import {Inter} from "next/font/google";
+import getConfig from "next/config";
 
-export const inter = Inter({subsets: ['latin']})
+export const {serverRuntimeConfig} = getConfig()
+
 export interface Params extends NextParsedUrlQuery {
   id: string;
 }
@@ -11,6 +12,7 @@ export interface CarType {
   id: string;
   color: string;
   image: string;
+  horsepower: number;
 }
 
 export interface Props {
@@ -29,16 +31,17 @@ export interface CarsProps {
   };
 }
 
+
 export const getCar = async (context: GetStaticPropsContext<Params>): Promise<CarProps> => {
   const params = context.params;
-  const req = await fetch(`http://localhost:3000/${params?.id}.json`);
+  const req = await fetch(`${serverRuntimeConfig.apiUrl}/${params?.id}.json`);
   const car = await req.json();
 
   return {props: {car}};
 };
 
 export const getCars = async (): Promise<CarsProps> => {
-  const req = await fetch('http://localhost:3000/cars.json');
+  const req = await fetch(`${serverRuntimeConfig.apiUrl}/cars.json`);
   const cars = await req.json();
 
   return {props: {cars}};
